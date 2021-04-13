@@ -1,4 +1,5 @@
 # Install Docker
+Install Docker with the following commands
 ```
 sudo apt -y install apt-transport-https ca-certificates curl software-properties-common
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
@@ -9,12 +10,12 @@ sudo apt -y install docker-ce
 ```
 
 # Install HA Proxy
-Install HA Proxy with the following commands.
+Install HA Proxy with the following commands
 ```
 sudo apt -y install haproxy
 ```
 
-Config file location.
+Config file location
 ```
 /etc/haproxy/haproxy.cfg
 ```
@@ -125,4 +126,58 @@ crontab -e
 Configuration cron on start instance
 ```
 @reboot sudo sh /opt/onStart.sh
+```
+
+# Install MongoDB
+Install MongoDB Community Edition with the following commands
+```
+wget -qO - https://www.mongodb.org/static/pgp/server-4.4.asc | sudo apt-key add -
+echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu focal/mongodb-org/4.4 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-4.4.list
+sudo apt-get update
+sudo apt-get install -y mongodb-org
+```
+
+To enable on start instance
+```
+sudo systemctl enable mongod
+```
+
+# Enable remote access on MongoDB using MongoDBCompass
+Nginx config file location 
+```
+/etc/nginx/nginx.conf
+```
+
+Configuration for nginx.conf
+```
+***
+stream {
+    server {
+        listen 27020;
+        proxy_connect_timeout 300;
+        proxy_timeout 300;
+        proxy_pass    stream_mongo;
+    }
+
+    upstream stream_mongo {
+        server 127.0.0.1:27017;
+    }
+}
+
+http {
+***
+```
+
+Mongod config file location 
+```
+/etc/mongod.conf
+```
+
+Configuration for mongod.conf
+```
+***
+net:
+  port: 27017
+  bindIp: 0.0.0.0
+***
 ```
