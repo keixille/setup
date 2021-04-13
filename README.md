@@ -142,7 +142,7 @@ To enable on start instance
 sudo systemctl enable mongod
 ```
 
-# Enable remote access on MongoDB using MongoDBCompass
+## Enable remote access on MongoDB
 Nginx config file location 
 ```
 /etc/nginx/nginx.conf
@@ -168,16 +168,7 @@ http {
 ***
 ```
 
-Mongod config file location 
+Change Security Groups Inbound
 ```
-/etc/mongod.conf
-```
-
-Configuration for mongod.conf
-```
-***
-net:
-  port: 27017
-  bindIp: 0.0.0.0
-***
+|Custom TCP Rule|TCP|27020|0.0.0.0/0|
 ```
