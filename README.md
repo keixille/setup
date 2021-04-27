@@ -9,7 +9,8 @@ apt-cache policy docker-ce
 sudo apt -y install docker-ce
 ```
 
-# Install HA Proxy
+# HA Proxy
+## Install HA Proxy
 Install HA Proxy with the following commands
 ```
 sudo apt -y install haproxy
@@ -49,6 +50,49 @@ backend http_back
 backend http_auth
    balance roundrobin
    server auth_spring1 172.31.74.118:80 check
+```
+
+## SSL on HA Proxy
+Install Certbot with the following commands
+```
+sudo add-apt-repository -y ppa:certbot/certbot
+sudo apt-get update
+sudo apt-get install -y certbot
+```
+
+Change the HA Proxy configuration file
+```
+frontend http_front
+    bind *:80
+    stats uri /haproxy?stats
+
+    acl letsencrypt_acl path_beg /.well-known/acme-challenge/
+    use_backend letsencrypt_backend if letsencrypt_acl
+
+    default_backend http_back
+
+backend letsencrypt_backend
+    server letsencrypt 127.0.0.1:8888
+
+backend http_auth
+   balance roundrobin
+   server back_spring1 172.31.77.2:80 check
+```
+
+Run the command below
+```
+sudo certbot certonly --standalone -d test.haproxy.com \
+    --non-interactive --agree-tos --email admin@example.com \
+    --http-01-port=8888
+```
+
+Store the public key
+```
+sudo mkdir -p /etc/ssl/test.haproxy.com
+
+sudo cat /etc/letsencrypt/live/test.haproxy.com/fullchain.pem \
+    /etc/letsencrypt/live/test.haproxy.com/privkey.pem \
+    | sudo tee /etc/ssl/test.haproxy.com/test.haproxy.com.pem
 ```
 
 # Install Nginx
@@ -142,7 +186,7 @@ To enable on start instance
 sudo systemctl enable mongod
 ```
 
-## Enable remote access on MongoDB
+## Enable remote access on local MongoDB
 Nginx config file location 
 ```
 /etc/nginx/nginx.conf
