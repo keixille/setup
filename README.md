@@ -62,8 +62,10 @@ sudo apt-get install -y certbot
 
 Change the HA Proxy configuration file
 ```
+***
 frontend http_front
     bind *:80
+    
     stats uri /haproxy?stats
 
     acl letsencrypt_acl path_beg /.well-known/acme-challenge/
@@ -73,26 +75,36 @@ frontend http_front
 
 backend letsencrypt_backend
     server letsencrypt 127.0.0.1:8888
-
-backend http_auth
-   balance roundrobin
-   server back_spring1 172.31.77.2:80 check
+***
 ```
 
 Run the command below
 ```
 sudo certbot certonly --standalone -d test.haproxy.com \
-    --non-interactive --agree-tos --email admin@example.com \
-    --http-01-port=8888
+--non-interactive --agree-tos --email admin@example.com \
+--http-01-port=8888
 ```
 
-Store the public key
+Concat certificate and private key
+fullchain = (server + intermediate) certificate 
 ```
 sudo mkdir -p /etc/ssl/test.haproxy.com
 
 sudo cat /etc/letsencrypt/live/test.haproxy.com/fullchain.pem \
-    /etc/letsencrypt/live/test.haproxy.com/privkey.pem \
-    | sudo tee /etc/ssl/test.haproxy.com/test.haproxy.com.pem
+/etc/letsencrypt/live/test.haproxy.com/privkey.pem \
+| sudo tee /etc/ssl/test.haproxy.com/test.haproxy.com.pem
+```
+
+Change HA Proxy configuration to bind SSL connection with created certificate
+```
+***
+frontend http_front
+    bind *:80
+    bind *:443 ssl crt /etc/ssl/test.haproxy.com/test.haproxy.com.pem
+    
+    stats uri /haproxy?stats
+***
+
 ```
 
 # Install Nginx
