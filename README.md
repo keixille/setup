@@ -229,3 +229,31 @@ Change Security Groups Inbound
 |Type|Protocol|Port Range|Source|Description
 |-|-|-|-|-|
 |Custom TCP Rule|TCP|27020|0.0.0.0/0|Remote MongoDB|
+***
+
+# AWS
+## Install AWS CLI
+Install AWS command line interface 
+```
+curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+unzip awscliv2.zip
+sudo sh install
+```
+
+Start instance
+```
+aws ec2 start-instances --instance-ids i-05f0e7585c060ae78
+```
+
+Stop instance
+```
+aws ec2 stop-instances --instance-ids i-05f0e7585c060ae78
+```
+
+Modify volume
+```
+aws ec2 modify-volume --volume-id vol-05b58fb86f023f6d3 --size 10 --volume-type gp2
+```
+
+More EC2 command on --> https://docs.aws.amazon.com/cli/latest/reference/ec2/index.html#cli-aws-ec2
+***
