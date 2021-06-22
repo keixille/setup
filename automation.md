@@ -1,5 +1,5 @@
 # Foundationdb
-## FoundationDB
+## Install FoundationDB
 This will install FoundationDB client and server in an EC2 instance
 ```
 wget https://www.foundationdb.org/downloads/6.3.15/ubuntu/installers/foundationdb-clients_6.3.15-1_amd64.deb
@@ -25,22 +25,15 @@ UEne9POl:OrNNBVzZiNIRwbkBw0KdsU8S2SKXHQRL@172.31.17.217:4500,172.31.28.93:4500
 The changes are client secret and IP of another coordinator instance
 
 # Prometheus
+## Install Prometheus
+In the separate instance from instance that we want to monitor
+```
 wget https://github.com/prometheus/prometheus/releases/download/v2.28.0-rc.0/prometheus-2.28.0-rc.0.linux-amd64.tar.gz
 sudo tar xf prometheus-2.28.0-rc.0.linux-amd64.tar.gz
+```
 
-cd prometheus-2.28.0-rc.0.linux-amd64
-sudo ./prometheus --config.file=./prometheus.yml &
-
-
-
-
-// Node Exporter
-wget https://github.com/prometheus/node_exporter/releases/download/v1.1.2/node_exporter-1.1.2.linux-amd64.tar.gz
-sudo tar xf node_exporter-1.1.2.linux-amd64.tar.gz
-
-cd node_exporter-1.1.2.linux-amd64
-sudo ./node_exporter &
-
+In the prometheus.yml file, change the target to point our private IP of EC2 and make sure the security group is updated
+```
 ***
 scrape_configs:
   # The job name is added as a label `job=<job_name>` to any timeseries scraped from this config.
@@ -52,5 +45,26 @@ scrape_configs:
     static_configs:
             - targets: ['localhost:9090',172.31.29.109:9100]
 ***
+```
+
+To run the prometheus to command is below
+```
+cd prometheus-2.28.0-rc.0.linux-amd64
+sudo ./prometheus --config.file=./prometheus.yml &
+```
+
+## Install Node Exporter
+In the instance that we want to monitor, we will need to install node exporter on it
+```
+wget https://github.com/prometheus/node_exporter/releases/download/v1.1.2/node_exporter-1.1.2.linux-amd64.tar.gz
+sudo tar xf node_exporter-1.1.2.linux-amd64.tar.gz
+```
+
+To run the node exporter the command is below
+```
+cd node_exporter-1.1.2.linux-amd64
+sudo ./node_exporter &
+```
+
 
 fdbcli --exec "status json"
